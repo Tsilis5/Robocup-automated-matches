@@ -1,0 +1,90 @@
+# coding: utf-8
+# python3 '/home/chris/Desktop/soccer2.py'
+import os
+import pyautogui
+from time import sleep
+import datetime
+
+
+def Run():
+    os.system("gnome-terminal -e 'bash -c \"rcsoccersim > output.txt\"'")
+    sleep(5)
+
+    filename = '/home/chris/Documents/GAME_RUNNER_FOLDER/data/Games.txt'
+    with open(filename) as file:
+        lines = [line.rstrip() for line in file]
+
+    print('Total Games :'+str(len(lines)))
+
+    for r in lines:
+        Team_A, Team_B = r.strip().split(',')
+        print('****************\n\t'+str(Team_A))
+        print('\tVs')
+        print('\t'+str(Team_B)+'****************\n')
+
+
+        list_tems = [os.listdir(name) for name in os.listdir(".") if os.path.isdir(name) and name=='tems'][0]
+
+        for team in list_tems:
+            if team == Team_A:
+                team_files = [name for name in os.listdir('tems/'+team) if 'start' in name]
+                print(team_files)
+                start_A = team_files[0]
+                print(start_A)
+                cmd = "/home/chris/tems/{}/{}".format(team,start_A)
+                print(cmd)
+                os.system(cmd)
+                sleep(3)
+
+            if team == Team_B:
+                team_files = [name for name in os.listdir('tems/'+team) if 'start' in name]
+                print(team_files)
+                start_B = team_files[0]
+                print(start_B)
+                cmd = "/home/chris/tems/{}/{}".format(team,start_B)
+                print(cmd)
+                os.system(cmd)
+
+        sleep(4)
+        print('Trying kick-off')
+        pyautogui.hotkey('ctrl', 'k')  # to kick-off
+        print('Trying kick-off passed')
+
+        sleep(10)
+        pyautogui.hotkey('ctrl', 'q')  # to finish
+        sleep(2)
+
+        write_output(Team_A, Team_B)
+
+        print('Running for next . .  .\n\n*********************************************\n\n*********************************************')
+
+
+def write_output(Team_A, Team_B):
+    try:
+        filename='output.txt'
+        with open(filename) as file:
+            lines = [line.rstrip() for line in file]
+
+        for l in lines:
+            if 'Game Results:' in l:
+                result = (lines[lines.index(l):lines.index(l)+4])
+
+        result = [x.strip() for x in result]
+        result = ' '.join(result)
+        print(result)
+        with open(filename,'a') as f:
+            f.write('Team_A,Team_B,{}\n'.format(result))
+
+    except Exception as e:
+        print('Error while reading output file:'+str(e))
+        pass
+
+    return 'output saved.'
+
+
+if __name__=='__main__':
+    filename = str('Soccer_Results_'+datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S"))+'.csv'
+    with open(filename,'w') as f:
+        f.write('Team_A,Team_B,Result\n')
+
+    Run()
